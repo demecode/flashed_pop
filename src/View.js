@@ -2,7 +2,7 @@ import * as R from 'ramda';
 import hh from 'hyperscript-helpers';
 import { h } from 'virtual-dom';
 import { model } from './Model';
-import { newCardMsg, questionInputMsg, answerInputMsg, saveMsg,showAnswerMsg, editCardMsg } from './Update';
+import { newCardMsg, questionInputMsg, answerInputMsg, saveMsg, showAnswerMsg, editCardMsg, scoreCardMsg, SCORES } from './Update';
 
 const { div, h1, pre, a, i, textarea, form, thead, tr, th, label, input, button } = hh(h);
 
@@ -57,6 +57,7 @@ const editQuestion = (dispatch, card) => {
 
 // edit answer
 const editAnswer = (dispatch, card) => {
+
     return div({ className: '' }, [
         div({ className: 'b f6 mv1' }, 'Answer'),
         textarea({
@@ -74,7 +75,8 @@ const editCard = (dispatch, card) => {
 
         div(
             {
-                className: 'w-100 h-100 pa2 bg-light-yellow shadow-1 mv2 relative pb5' },
+                className: 'w-100 h-100 pa2 bg-light-yellow shadow-1 mv2 relative pb5'
+            },
             [
                 editQuestion(dispatch, card),
                 editAnswer(dispatch, card),
@@ -90,6 +92,38 @@ const editCard = (dispatch, card) => {
     );
 }
 
+const gradeButtons = (dispatch, card) => {
+    const { showAnswer, rank } = card
+    if (showAnswer) {
+        return div([
+            div({ className: 'absolute bottom-0 left-0 w-100 ph2' }, [
+                button(
+                    {
+                        className: 'f4 ph3 pv2 bg-red bn white br1',
+                        onclick: () => dispatch(scoreCardMsg(card.id, SCORES.BAD)),
+                    },
+                    'BAD'
+                ),
+                button(
+                    {
+                        className: 'f4 ph3 pv2 bg-blue bn white br1',
+                        onclick: () => dispatch(scoreCardMsg(card.id, SCORES.GOOD)),
+                    },
+                    'GOOD'
+                ),
+                button(
+                    {
+                        className: 'f4 ph3 pv2 bg-black bn white br1',
+                        onclick: () => dispatch(scoreCardMsg(card.id, SCORES.SUPER)),
+                    },
+                    'SUPER',
+                ),
+            ]),
+        ]);
+    }
+}
+
+
 
 // view a card
 const viewCard = (dispatch, card) => {
@@ -102,7 +136,7 @@ const viewCard = (dispatch, card) => {
                 question(dispatch, card),
                 answer(dispatch, card),
                 // deleteCard(dispatch, card),
-                // gradeButtons(dispatch, card),
+                gradeButtons(dispatch, card),
             ],
         ),
     );

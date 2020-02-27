@@ -48,6 +48,18 @@ export const editCardMsg = (id) => {
     };
 }
 
+export const scoreCardMsg = (id, score) => {
+    return {
+        type: MSGS.SCORE,
+        id,
+        score,
+    }
+}
+export const SCORES = {
+    BAD: 0,
+    GOOD: 1,
+    SUPER: 2,
+}
 
 export const newCardMsg = {
     type: MSGS.NEW_CARD,
@@ -77,7 +89,7 @@ const update = (msg, model) => {
                 edit: true,
             };
             const updateCards = R.prepend(newCard, cards);
-            return { ...model, cards: updateCards, nextId: id + 1}
+            return { ...model, cards: updateCards, nextId: id + 1 }
         }
         case MSGS.QUESTION: {
             const { id, question } = msg;
@@ -110,8 +122,42 @@ const update = (msg, model) => {
             const updateCards = R.map(updatedCards({ id, edit: true }), cards);
             return { ...model, cards: updateCards };
         }
-        default: 
-        return model;
+        case MSGS.SCORE: {
+            const { id, score } = msg;
+            const { cards } = model;
+            // we want to find a card and do this by using fucntion composition propEq
+            // once found, we put the card into the cards model 
+            const card = R.find(R.propEq('id', id), cards)
+            // now we want to create a ranking system by each score
+            //r.cond takes a list of predicates and transformers based on the if or else statament logic
+            const rank = R.cond([
+                // here if 'score' (predicate) is equal to the score.bad (which is 0), then the outcome will R.always equal 0
+                [R.propEq('score', SCORES.BAD), R.always(0)],
+                [R.propEq('score', SCORES.GOOD), ({ rank }) => rank + 1],
+                [R.propEq('score', SCORES.SUPER), ({ rank }) => rank + 2],
+            ])
+                // we then obtain the score, then apply the rank to the card.rank property from the model
+                ({ score, rank: card.rank });
+
+
+            // then we use updatedCards function to update the cards
+            // use R.pipe to ensure r.map function is evaluated before the sort
+            const updateCards = R.pipe(
+
+                //show answer will be false as once vote is done card answer should close
+                R.map(updatedCards({ id, showAnswer: false, rank })),
+                // then we sort the cards based on the rank prop from the model in ascending order
+                R.sortWith([
+                    // sort by rank, by the highest
+                    R.ascend(R.prop('rank')),
+                    // sort the cards in descending by rank and id
+                    R.descend(R.prop('id'))],
+                )
+            )(cards);
+            return { ...model, cards: updateCards };
+        }
+        default:
+            return model;
     }
 }
 
