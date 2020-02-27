@@ -2,7 +2,7 @@ import * as R from 'ramda';
 import hh from 'hyperscript-helpers';
 import { h } from 'virtual-dom';
 import { model } from './Model';
-import { newCardMsg, questionInputMsg, answerInputMsg, saveMsg, showAnswerMsg, editCardMsg, scoreCardMsg, SCORES } from './Update';
+import { deleteCardMsg, newCardMsg, questionInputMsg, answerInputMsg, saveMsg, showAnswerMsg, editCardMsg, scoreCardMsg, SCORES } from './Update';
 
 const { div, h1, pre, a, i, textarea, form, thead, tr, th, label, input, button } = hh(h);
 
@@ -92,6 +92,18 @@ const editCard = (dispatch, card) => {
     );
 }
 
+const deleteCard = (dispatch, card) => {
+    return div([
+        i(
+            {
+                className: 'absolute top-0 right-0 fa fa-remove fa-fw black-50 pointer',
+                onclick: () => dispatch(deleteCardMsg(card.id))
+            }
+
+        ),
+    ]);
+}
+
 const gradeButtons = (dispatch, card) => {
     const { showAnswer, rank } = card
     if (showAnswer) {
@@ -135,7 +147,7 @@ const viewCard = (dispatch, card) => {
             [
                 question(dispatch, card),
                 answer(dispatch, card),
-                // deleteCard(dispatch, card),
+                deleteCard(dispatch, card),
                 gradeButtons(dispatch, card),
             ],
         ),

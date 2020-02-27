@@ -55,6 +55,13 @@ export const scoreCardMsg = (id, score) => {
         score,
     }
 }
+
+export const deleteCardMsg = (id) => {
+    return {
+        type: MSGS.DELETE,
+        id,
+    }
+}
 export const SCORES = {
     BAD: 0,
     GOOD: 1,
@@ -90,6 +97,13 @@ const update = (msg, model) => {
             };
             const updateCards = R.prepend(newCard, cards);
             return { ...model, cards: updateCards, nextId: id + 1 }
+        }
+        case MSGS.DELETE: {
+            const { id } = msg;
+            const { cards } = model;
+            const updateCards = R.reject(R.propEq('id', id), cards)
+            return {  ...model, cards: updateCards };
+
         }
         case MSGS.QUESTION: {
             const { id, question } = msg;
