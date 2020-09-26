@@ -2,4 +2,4 @@
 
 Functional style little app.
 
-Add, edit, delete and rank cards!
+Add, edit, delete and rank stacks
