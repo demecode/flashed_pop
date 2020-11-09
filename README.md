@@ -1,5 +1,7 @@
 # flashed_popsmoke
 
-Functional style little app.
+STICKY NOTE web app.
 
-Add, edit, delete and rank stacks
+Add, edit, delete and rank stacks.
+
+
